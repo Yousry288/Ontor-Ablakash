@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <!-- حماية الصفحة: تسجيل الدخول مطلوب مرة واحدة -->
+    <script>
+        if (localStorage.getItem("loggedIn") !== "true") {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>انطر أبلكاش 🔫</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         الهيدر
+    ========================= -->
+
+    <header class="header">
+
+        <div class="header-image">
+
+            <img
+                src="photos/unnamed.jpg"
+                alt="صورة الفنان">
+
+        </div>
+
+
+        <div class="title">
+
+            <h1>🔫 انطر أبلكاش</h1>
+
+            <p>
+                البقاء للأمهر 🧠
+            </p>
+
+            <div class="season-badge">
+
+                🏆 الموسم الحالي
+
+                <span>
+                    Season 2
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-image">
+
+            <img
+                src="photos/WhatsApp_Image_2026-09-09_at_4.36.58_PM-removebg-preview.png"
+                alt="لوجو الاتحاد">
+
+        </div>
+
+    </header>
+
+
+
+    <main>
+
+
+        <!-- =========================
+             اللاعبين
+        ========================= -->
+
+        <section class="players-card">
+
+
+            <!-- Yousry -->
+
+            <div class="player">
+
+                <h2>
+                    Yousry
+                </h2>
+
+                <div
+                    class="score"
+                    id="yousry-score">
+
+                    0
+
+                </div>
+
+                <p>
+                    نقطة
+                </p>
+
+                <button
+                    class="point-button yousry-btn"
+                    onclick="addPoint('Yousry')">
+
+                    🎯 يسري خد النقطة
+
+                </button>
+
+            </div>
+
+
+
+            <!-- VS -->
+
+            <div class="vs">
+
+                <span>
+                    VS
+                </span>
+
+                <div>
+                    ⚡
+                </div>
+
+            </div>
+
+
+
+            <!-- Yassin -->
+
+            <div class="player">
+
+                <h2>
+                    Yassin
+                </h2>
+
+                <div
+                    class="score"
+                    id="yassin-score">
+
+                    0
+
+                </div>
+
+                <p>
+                    نقطة
+                </p>
+
+                <button
+                    class="point-button yassin-btn"
+                    onclick="addPoint('Yassin')">
+
+                    🎯 ياسين خد النقطة
+
+                </button>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================
+             العداد
+        ========================= -->
+
+        <section class="timer-card">
+
+            <h2>
+                ⏱️ الوقت المتبقي
+            </h2>
+
+            <div id="timer">
+
+                النقطة متاحة الآن 🔥
+
+            </div>
+
+            <p id="timer-info">
+
+                مفيش نقطة مسجلة حاليًا
+
+            </p>
+
+        </section>
+
+
+
+        <!-- =========================
+             مفيش نَطْرة
+        ========================= -->
+
+        <section class="no-point-card">
+
+            <h2>
+                🚫 مفيش نَطْرة النهارده
+            </h2>
+
+            <p>
+
+                لو اليوم خلص ومحدش خد النقطة،
+                سجلها هنا.
+
+            </p>
+
+
+            <button
+                class="no-point-button"
+                onclick="noPointToday()">
+
+                🚫 مفيش نَطْرة النهارده
+
+            </button>
+
+
+            <button
+                class="cancel-no-point-button"
+                onclick="cancelNoPoint()">
+
+                ↩️ إلغاء القرار — توجد نَطْرة
+
+            </button>
+
+
+            <button
+                class="delete-point-button"
+                onclick="deleteLastPoint()">
+
+                🗑️ حذف آخر نَطْرة
+
+            </button>
+
+        </section>
+
+
+
+        <!-- =========================
+             حالة النقطة
+        ========================= -->
+
+        <section class="winner-card">
+
+            <h2>
+                🎯 حالة النقطة
+            </h2>
+
+            <div id="today-status">
+
+                النقطة متاحة 🔥
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             المتصدر
+        ========================= -->
+
+        <section class="winner-card">
+
+            <h2>
+                👑 المتصدر
+            </h2>
+
+            <div id="leader">
+
+                لسه مفيش نقاط 😎
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             سجل الأحداث
+        ========================= -->
+
+        <section class="section-card">
+
+            <div class="section-title">
+
+                <h2>
+                    📜 سجل الأحداث
+                </h2>
+
+                <span id="event-count">
+
+                    0 حدث
+
+                </span>
+
+            </div>
+
+
+            <div id="events">
+
+                <div class="empty">
+
+                    <div>
+                        🎯
+                    </div>
+
+                    <p>
+                        مفيش أحداث لسه
+                    </p>
+
+                    <small>
+                        أول نقطة هتظهر هنا
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             ترتيب الدوري
+        ========================= -->
+
+        <a
+            href="standings.html"
+            target="_blank"
+            class="rules-button">
+
+            📊 ترتيب الدوري
+
+        </a>
+
+
+
+        <!-- =========================
+             القوانين
+        ========================= -->
+
+        <a
+            href="rules.html"
+            target="_blank"
+            class="rules-button">
+
+            📜 لائحة القوانين
+
+        </a>
+
+
+
+        <!-- =========================
+             الموسم السابق
+        ========================= -->
+
+        <section class="section-card">
+
+            <div class="section-title">
+
+                <h2>
+                    🏆 المواسم
+                </h2>
+
+            </div>
+
+
+            <div class="old-season">
+
+                <div class="season-icon">
+
+                    🏆
+
+                </div>
+
+
+                <div class="season-info">
+
+                    <h3>
+                        Season 1
+                    </h3>
+
+
+                    <p>
+
+                        <strong>
+                            Yousry
+                        </strong>
+
+                        31
+
+                        —
+
+                        29
+
+                        <strong>
+                            Yassin
+                        </strong>
+
+                    </p>
+
+
+                    <small>
+
+                        📅 انتهى في 15 يونيو 2026
+
+                    </small>
+
+                </div>
+
+
+                <div class="champion">
+
+                    🥇 Yousry
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             الإحصائيات
+        ========================= -->
+
+        <section class="section-card">
+
+            <div class="section-title">
+
+                <h2>
+                    📊 إحصائيات الموسم
+                </h2>
+
+            </div>
+
+
+            <div class="stats">
+
+
+                <div class="stat">
+
+                    <span>
+                        🎯
+                    </span>
+
+                    <strong id="total-points">
+
+                        0
+
+                    </strong>
+
+                    <small>
+
+                        إجمالي النقاط
+
+                    </small>
+
+                </div>
+
+
+
+                <div class="stat">
+
+                    <span>
+                        🔥
+                    </span>
+
+                    <strong id="yousry-wins">
+
+                        0
+
+                    </strong>
+
+                    <small>
+
+                        نقاط يسري
+
+                    </small>
+
+                </div>
+
+
+
+                <div class="stat">
+
+                    <span>
+                        ⚡
+                    </span>
+
+                    <strong id="yassin-wins">
+
+                        0
+
+                    </strong>
+
+                    <small>
+
+                        نقاط ياسين
+
+                    </small>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =========================
+         الفوتر
+    ========================= -->
+
+    <footer>
+
+        <p>
+            🔫 انطر أبلكاش
+        </p>
+
+        <small>
+
+            Season 2 • 2026 •
+
+        </small>
+
+    </footer>
+
+
+
+    <!-- ==================================================
+         نافذة اختيار مكان النَّطْرة
+    ================================================== -->
+
+    <div
+        id="question-modal"
+        class="question-modal">
+
+        <div class="question-box">
+
+
+            <h2>
+                📍 النَّطْرة كانت فين؟
+            </h2>
+
+
+            <div id="question-options">
+
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="selectPointLocation('المرور')">
+
+                    🚗 المرور
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="selectPointLocation('عيسى')">
+
+                    📍 عيسى
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="selectPointLocation('مبارك')">
+
+                    📍 مبارك
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="selectPointLocation('السلام')">
+
+                    📍 السلام
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="selectPointLocation('بيت ياسين')">
+
+                    🏠 بيت ياسين
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="selectPointLocation('بيت يسري')">
+
+                    🏠 بيت يسري
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="selectPointLocation('عزبة الشال')">
+
+                    📍 عزبة الشال
+
+                </button>
+
+
+                <!-- مكان مخصص -->
+
+                <button
+                    type="button"
+                    class="question-option"
+                    onclick="customLocation()">
+
+                    ✏️ لا شيء مما سبق — اكتب بنفسك
+
+                </button>
+
+
+            </div>
+
+
+            <button
+                type="button"
+                class="cancel-question"
+                onclick="cancelPointQuestion()">
+
+                إلغاء
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         نافذة كتابة المكان المخصص
+    ================================================== -->
+
+    <div
+        id="custom-location-modal"
+        class="question-modal">
+
+        <div class="question-box">
+
+
+            <h2>
+                ✏️ اكتب المكان
+            </h2>
+
+
+            <p>
+                اكتب اسم المكان
+            </p>
+
+
+            <input
+                type="text"
+                id="custom-location-input"
+                placeholder="اكتب اسم المكان..."
+                autocomplete="off">
+
+
+            <button
+                type="button"
+                class="question-option"
+                onclick="saveCustomLocation()">
+
+                🎯 تسجيل النَّطْرة
+
+            </button>
+
+
+            <button
+                type="button"
+                class="cancel-question"
+                onclick="cancelCustomLocation()">
+
+                إلغاء
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         JavaScript
+    ========================= -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>

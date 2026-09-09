@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>دخول - انطر أبلكاش 🔫</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-family: Arial, Tahoma, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0b0d12,
+                    #171a23
+                );
+
+            color: white;
+
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+
+            background: #151821;
+
+            border: 1px solid #282d39;
+
+            border-radius: 25px;
+
+            padding: 35px 25px;
+
+            text-align: center;
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #9da3b0;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 15px;
+
+            border-radius: 12px;
+
+            border: 1px solid #303543;
+
+            background: #0f1117;
+
+            color: white;
+
+            font-size: 16px;
+
+            text-align: center;
+
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #ffd166;
+        }
+
+        button {
+            width: 100%;
+
+            margin-top: 15px;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #d4a017,
+                    #ffd166
+                );
+
+            color: #111;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        #error {
+            min-height: 24px;
+
+            margin-top: 15px;
+
+            color: #ef4444;
+
+            font-size: 14px;
+        }
+
+        .footer {
+            margin-top: 25px;
+
+            color: #777f8d;
+
+            font-size: 13px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="login-card">
+
+        <div class="logo">
+            🔫
+        </div>
+
+        <h1>
+            انطر أبلكاش
+        </h1>
+
+        <p class="subtitle">
+            🏆 Season 2
+        </p>
+
+
+        <input
+            type="password"
+            id="password"
+            placeholder="اكتب كلمة السر"
+            autocomplete="off"
+            onkeydown="if(event.key === 'Enter') login()"
+        >
+
+
+        <button onclick="login()">
+            🔐 دخول
+        </button>
+
+
+        <p id="error"></p>
+
+
+        <div class="footer">
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const PASSWORD =
+            "1506";
+
+
+        function login() {
+
+            const password =
+                document.getElementById("password").value;
+
+            const error =
+                document.getElementById("error");
+
+
+            if (password === PASSWORD) {
+
+                localStorage.setItem(
+                    "loggedIn",
+                    "true"
+                );
+
+                window.location.href =
+                    "index.html";
+
+            } else {
+
+                error.textContent =
+                    "❌ كلمة السر غلط!";
+
+                document.getElementById(
+                    "password"
+                ).value = "";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

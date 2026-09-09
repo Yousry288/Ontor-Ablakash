@@ -1,0 +1,1021 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Tahoma, sans-serif;
+    background: #0b0d12;
+    color: white;
+    min-height: 100vh;
+}
+
+
+/* HEADER */
+
+.header {
+    background: linear-gradient(135deg, #171a23, #0b0d12);
+
+    padding: 20px 7%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    border-bottom: 1px solid #292d38;
+}
+
+.title {
+    text-align: center;
+    flex: 1;
+}
+
+.title h1 {
+    font-size: 32px;
+    margin-bottom: 7px;
+}
+
+.title p {
+    color: #9da3b0;
+    margin-bottom: 12px;
+}
+
+
+/* الصور */
+
+.header-image {
+    width: 110px;
+    height: 110px;
+
+    border: 2px dashed #454b59;
+    border-radius: 18px;
+
+    background: #1c2029;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.header-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* الموسم */
+
+.season-badge {
+    display: inline-block;
+
+    background: #1c202b;
+
+    border: 1px solid #303543;
+
+    padding: 9px 17px;
+
+    border-radius: 12px;
+
+    color: #aeb4c0;
+}
+
+.season-badge span {
+    display: block;
+
+    color: white;
+
+    font-weight: bold;
+
+    margin-top: 4px;
+}
+
+
+/* MAIN */
+
+main {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+
+/* PLAYERS */
+
+.players-card {
+    display: grid;
+
+    grid-template-columns: 1fr 100px 1fr;
+
+    align-items: center;
+
+    gap: 20px;
+
+    background: linear-gradient(145deg, #151821, #101219);
+
+    border: 1px solid #282d39;
+
+    border-radius: 25px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.35);
+}
+
+.player {
+    text-align: center;
+}
+
+.player h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+
+/* SCORE */
+
+.score {
+    font-size: 65px;
+
+    font-weight: bold;
+
+    margin: 5px 0;
+
+    background: linear-gradient(
+        180deg,
+        white,
+        #9ea5b2
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.player p {
+    color: #777f8d;
+}
+
+
+/* VS */
+
+.vs {
+    text-align: center;
+    color: #737b8a;
+}
+
+.vs span {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.vs div {
+    font-size: 30px;
+    margin-top: 8px;
+}
+
+
+/* BUTTONS */
+
+.point-button {
+    border: none;
+
+    padding: 13px 20px;
+
+    margin-top: 15px;
+
+    border-radius: 12px;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.yousry-btn {
+    background: #2563eb;
+}
+
+.yassin-btn {
+    background: #9333ea;
+}
+
+.point-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.15);
+}
+
+.point-button:active {
+    transform: scale(0.96);
+}
+
+
+/* TIMER */
+
+.timer-card {
+    margin-top: 20px;
+
+    background: #151821;
+
+    border: 1px solid #282d39;
+
+    border-radius: 20px;
+
+    padding: 25px;
+
+    text-align: center;
+}
+
+.timer-card h2 {
+    margin-bottom: 15px;
+}
+
+#timer {
+    font-size: 38px;
+
+    font-weight: bold;
+
+    color: #ffd166;
+}
+
+#timer-info {
+    margin-top: 10px;
+
+    color: #777f8d;
+}
+
+
+/* NO POINT */
+
+.no-point-card {
+    margin-top: 20px;
+
+    background: #151821;
+
+    border: 1px solid #282d39;
+
+    border-radius: 20px;
+
+    padding: 25px;
+
+    text-align: center;
+}
+
+.no-point-card h2 {
+    margin-bottom: 10px;
+}
+
+.no-point-card p {
+    color: #777f8d;
+
+    margin-bottom: 15px;
+}
+
+.no-point-button {
+    border: none;
+
+    padding: 13px 20px;
+
+    border-radius: 12px;
+
+    background: #dc2626;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.no-point-button:hover {
+    transform: translateY(-2px);
+
+    filter: brightness(1.15);
+}
+
+
+/* SECTIONS */
+
+.section-card,
+.winner-card {
+    margin-top: 20px;
+
+    background: #151821;
+
+    border: 1px solid #282d39;
+
+    border-radius: 20px;
+
+    padding: 22px;
+}
+
+.section-title {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.section-title h2 {
+    font-size: 21px;
+}
+
+.section-title span {
+    color: #777f8d;
+    font-size: 14px;
+}
+
+
+/* STATUS */
+
+#today-status {
+    font-size: 22px;
+
+    font-weight: bold;
+
+    color: #ffd166;
+}
+
+
+/* WINNER */
+
+.winner-card {
+    text-align: center;
+}
+
+.winner-card h2 {
+    margin-bottom: 10px;
+}
+
+#leader {
+    font-size: 22px;
+
+    font-weight: bold;
+
+    color: #ffd166;
+}
+
+
+/* EVENTS */
+
+.empty {
+    text-align: center;
+
+    padding: 30px;
+
+    color: #6f7785;
+}
+
+.empty div {
+    font-size: 40px;
+
+    margin-bottom: 10px;
+}
+
+.event {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    background: #1c2029;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    margin-bottom: 10px;
+
+    border: 1px solid #292e3a;
+}
+
+.event strong {
+    color: #ffd166;
+}
+
+.event small {
+    color: #737b8a;
+}
+
+
+/* OLD SEASON */
+
+.old-season {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    background: #1c2029;
+
+    padding: 17px;
+
+    border-radius: 15px;
+}
+
+.season-icon {
+    font-size: 35px;
+}
+
+.season-info {
+    flex: 1;
+}
+
+.season-info h3 {
+    margin-bottom: 7px;
+}
+
+.season-info p {
+    color: #d6d9df;
+}
+
+.season-info small {
+    display: block;
+
+    color: #777f8d;
+
+    margin-top: 7px;
+}
+
+.champion {
+    color: #ffd166;
+    font-weight: bold;
+}
+
+
+/* STATS */
+
+.stats {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.stat {
+    background: #1c2029;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    text-align: center;
+}
+
+.stat span {
+    display: block;
+
+    font-size: 25px;
+
+    margin-bottom: 8px;
+}
+
+.stat strong {
+    display: block;
+
+    font-size: 30px;
+}
+
+.stat small {
+    color: #777f8d;
+}
+
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+
+    padding: 30px;
+
+    color: #777f8d;
+}
+
+footer p {
+    color: white;
+
+    font-weight: bold;
+
+    margin-bottom: 5px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .header {
+        padding: 15px;
+        gap: 8px;
+    }
+
+    .header-image {
+        width: 75px;
+        height: 75px;
+    }
+
+    .title h1 {
+        font-size: 23px;
+    }
+
+    .title p {
+        font-size: 11px;
+    }
+
+    .season-badge {
+        font-size: 11px;
+        padding: 7px 10px;
+    }
+
+    .players-card {
+        grid-template-columns: 1fr 50px 1fr;
+
+        padding: 20px 10px;
+
+        gap: 5px;
+    }
+
+    .score {
+        font-size: 48px;
+    }
+
+    .player h2 {
+        font-size: 18px;
+    }
+
+    .point-button {
+        padding: 10px 7px;
+        font-size: 12px;
+    }
+
+    #timer {
+        font-size: 28px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .old-season {
+        flex-wrap: wrap;
+    }
+
+    .champion {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+}
+/* RANKING BUTTON */
+
+.ranking-card {
+text-align: center;
+}
+
+.ranking-description {
+color: #777f8d;
+margin-bottom: 18px;
+}
+
+.ranking-button {
+display: inline-block;
+text-decoration: none;
+background: linear-gradient(135deg, #d4a017, #ffd166);
+color: #111;
+padding: 13px 24px;
+border-radius: 12px;
+font-size: 16px;
+font-weight: bold;
+transition: 0.2s;
+}
+
+.ranking-button:hover {
+transform: translateY(-2px);
+filter: brightness(1.1);
+}
+
+.ranking-button:active {
+transform: scale(0.96);
+}
+
+/* STANDINGS TABLE */
+
+.standings-table {
+width: 100%;
+border-collapse: collapse;
+overflow: hidden;
+border-radius: 15px;
+}
+
+.standings-table th {
+background: #1c2029;
+color: #ffd166;
+padding: 15px 10px;
+font-size: 14px;
+}
+
+.standings-table td {
+padding: 16px 10px;
+text-align: center;
+border-top: 1px solid #292e3a;
+}
+
+.standings-table tr {
+background: #151821;
+}
+
+.standings-table tr:hover {
+background: #1c2029;
+}
+
+.rank-number {
+font-size: 20px;
+font-weight: bold;
+}
+
+.player-name {
+font-weight: bold;
+font-size: 17px;
+}
+
+.points-number {
+color: #ffd166;
+font-size: 21px;
+font-weight: bold;
+}
+
+.first-place {
+background: linear-gradient(
+90deg,
+#292313,
+#151821
+) !important;
+}
+
+@media (max-width: 700px) {
+
+.standings-table th,
+.standings-table td {
+    padding: 12px 5px;
+    font-size: 12px;
+}
+
+.player-name {
+    font-size: 14px;
+}
+
+.points-number {
+    font-size: 18px;
+}
+
+}
+/* DELETE LAST POINT */
+
+.delete-point-button {
+    border: none;
+    padding: 13px 20px;
+    margin-top: 12px;
+    border-radius: 12px;
+    background: #4b5563;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.delete-point-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.15);
+}
+
+.delete-point-button:active {
+    transform: scale(0.96);
+}
+/* RULES BUTTON */
+
+.rules-button {
+    display: inline-block;
+    margin-top: 12px;
+    text-decoration: none;
+    background: #374151;
+    color: white;
+    padding: 13px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.rules-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.15);
+}
+
+
+/* GOVERNMENT STYLE RULES PAGE */
+
+.rules-page {
+    background: #f4f1e8;
+    color: #111;
+    min-height: 100vh;
+    font-family: "Times New Roman", Tahoma, serif;
+}
+
+.rules-document {
+    max-width: 950px;
+    margin: 30px auto;
+    padding: 45px 55px;
+    background: #fffdf5;
+    border: 2px solid #222;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.government-header {
+    display: grid;
+    grid-template-columns: 1fr 180px 1fr;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 3px double #111;
+}
+
+.government-right {
+    text-align: right;
+    font-weight: bold;
+    line-height: 1.8;
+}
+
+.government-right h2 {
+    font-size: 22px;
+}
+
+.government-right p {
+    font-size: 17px;
+}
+
+.union-logo {
+    width: 160px;
+    height: 110px;
+    border: 2px dashed #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    overflow: hidden;
+    background: #f7f5ec;
+}
+
+.union-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.logo-placeholder {
+    color: #777;
+    text-align: center;
+    font-size: 14px;
+}
+
+.government-left {
+    text-align: left;
+    font-weight: bold;
+    direction: ltr;
+}
+
+.rules-title {
+    text-align: center;
+    margin: 35px 0 25px;
+}
+
+.rules-title h1 {
+    font-size: 30px;
+    text-decoration: underline;
+    margin-bottom: 10px;
+}
+
+.rules-title p {
+    font-size: 18px;
+}
+
+.rules-list {
+    margin-top: 20px;
+    padding-right: 35px;
+    line-height: 2.2;
+    font-size: 18px;
+}
+
+.rules-list li {
+    margin-bottom: 12px;
+    padding-right: 8px;
+}
+
+.rules-section-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 30px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #555;
+}
+
+.rules-footer {
+    margin-top: 45px;
+    padding-top: 20px;
+    border-top: 2px solid #111;
+    text-align: center;
+    font-size: 15px;
+}
+
+.back-rules-button {
+    display: block;
+    width: fit-content;
+    margin: 25px auto 0;
+    padding: 12px 22px;
+    background: #222;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+@media (max-width: 700px) {
+
+    .rules-document {
+        margin: 10px;
+        padding: 25px 18px;
+    }
+
+    .government-header {
+        grid-template-columns: 1fr 120px;
+    }
+
+    .government-left {
+        display: none;
+    }
+
+    .union-logo {
+        width: 110px;
+        height: 80px;
+    }
+
+    .government-right h2 {
+        font-size: 17px;
+    }
+
+    .government-right p {
+        font-size: 14px;
+    }
+
+    .rules-title h1 {
+        font-size: 24px;
+    }
+
+    .rules-list {
+        font-size: 16px;
+        padding-right: 25px;
+    }
+}
+/* CANCEL NO POINT */
+
+.cancel-no-point-button {
+    border: none;
+    padding: 13px 20px;
+    margin-top: 12px;
+    border-radius: 12px;
+    background: #b45309;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.cancel-no-point-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.15);
+}
+
+.cancel-no-point-button:active {
+    transform: scale(0.96);
+}
+/* QUESTION MODAL */
+
+.question-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.question-box {
+    width: 100%;
+    max-width: 450px;
+    background: #151821;
+    border: 1px solid #343a48;
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.question-box h2 {
+    margin-bottom: 20px;
+    color: #ffd166;
+}
+
+#question-options {
+    display: grid;
+    gap: 10px;
+}
+
+.question-option {
+    border: 1px solid #343a48;
+    background: #1c2029;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.question-option:hover {
+    background: #292f3b;
+    transform: translateY(-2px);
+}
+
+.cancel-question {
+    border: none;
+    margin-top: 15px;
+    padding: 11px 25px;
+    border-radius: 10px;
+    background: #4b5563;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* =========================
+   خانة المكان المخصص
+========================= */
+/* =========================
+   مربع كتابة المكان المخصص
+========================= */
+
+#custom-location-input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 15px 18px;
+    margin-bottom: 12px;
+
+    border: 2px solid #343a48;
+    border-radius: 14px;
+
+    background: #1c2029;
+    color: white;
+
+    font-family: Arial, Tahoma, sans-serif;
+    font-size: 17px;
+
+    text-align: right;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+#custom-location-input:focus {
+    border-color: #ffd166;
+    box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.12);
+}
+
+#custom-location-input::placeholder {
+    color: #9ca3af;
+}

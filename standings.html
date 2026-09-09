@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+
+<head>
+
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+<title>ترتيب الدوري 🔫</title>
+
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body>
+
+
+<header class="header">
+
+    <div class="title">
+
+        <h1>🏆 جدول ترتيب الدوري</h1>
+
+        <p>🔫 انطر أبلكاش — Season 2</p>
+
+        <div class="season-badge">
+
+            🏆 الموسم الحالي
+
+            <span>Season 2</span>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <section class="section-card">
+
+        <div class="section-title">
+
+            <h2>📊 الترتيب</h2>
+
+        </div>
+
+
+        <div style="overflow-x:auto;">
+
+            <table class="standings-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+                        <th>اللاعب</th>
+                        <th>لعب</th>
+                        <th>فاز</th>
+                        <th>خسر</th>
+                        <th>النقاط</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="standings-body">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <section class="winner-card">
+
+        <h2>👑 المتصدر</h2>
+
+        <div id="leader">
+            لسه مفيش نَطْرات 😎
+        </div>
+
+    </section>
+
+
+    <section class="section-card">
+
+        <div class="section-title">
+
+            <h2>📌 نظام الترتيب</h2>
+
+        </div>
+
+        <p style="color:#9da3b0; line-height:2;">
+
+            🎯 الفوز بالنَطْرة = 1 نقطة<br>
+            ❌ الخسارة = 0 نقطة<br>
+            🚫 مفيش تعادل<br>
+            📊 «مفيش نَطْرة النهارده» لا تُحسب مباراة
+
+        </p>
+
+    </section>
+
+
+    <div style="text-align:center; margin-top:20px;">
+
+        <a
+            href="index.html"
+            class="ranking-button">
+
+            🔙 العودة للصفحة الرئيسية
+
+        </a>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    function getStandings() {
+
+        const events =
+            JSON.parse(
+                localStorage.getItem("events")
+            ) || [];
+
+
+        let yousryWins = 0;
+        let yassinWins = 0;
+
+
+        /*
+            كل حدث من نوع point
+            = مباراة واحدة
+        */
+
+        events.forEach(event => {
+
+            if (event.type !== "point") {
+                return;
+            }
+
+
+            if (event.player === "Yousry") {
+                yousryWins++;
+            }
+
+
+            if (event.player === "Yassin") {
+                yassinWins++;
+            }
+
+        });
+
+
+        const totalMatches =
+            yousryWins + yassinWins;
+
+
+        return [
+
+            {
+                name: "Yousry",
+                played: totalMatches,
+                wins: yousryWins,
+                losses: yassinWins,
+                points: yousryWins
+            },
+
+            {
+                name: "Yassin",
+                played: totalMatches,
+                wins: yassinWins,
+                losses: yousryWins,
+                points: yassinWins
+            }
+
+        ].sort((a, b) => {
+
+            return b.points - a.points;
+
+        });
+
+    }
+
+
+    function updateStandings() {
+
+        const standings =
+            getStandings();
+
+        const body =
+            document.getElementById(
+                "standings-body"
+            );
+
+        body.innerHTML = "";
+
+
+        standings.forEach((player, index) => {
+
+            const row =
+                document.createElement("tr");
+
+
+            if (index === 0 && player.points > 0) {
+
+                row.classList.add("first-place");
+
+            }
+
+
+            let medal = "";
+
+            if (index === 0) medal = "🥇";
+            if (index === 1) medal = "🥈";
+
+
+            row.innerHTML = `
+
+                <td class="rank-number">
+                    ${medal || index + 1}
+                </td>
+
+                <td class="player-name">
+                    ${player.name}
+                </td>
+
+                <td>
+                    ${player.played}
+                </td>
+
+                <td>
+                    ${player.wins}
+                </td>
+
+                <td>
+                    ${player.losses}
+                </td>
+
+                <td class="points-number">
+                    ${player.points}
+                </td>
+
+            `;
+
+
+            body.appendChild(row);
+
+        });
+
+
+        const leader =
+            document.getElementById("leader");
+
+
+        if (standings[0].points === 0) {
+
+            leader.textContent =
+                "لسه مفيش نَطْرات 😎";
+
+            return;
+
+        }
+
+
+        if (
+            standings[0].points ===
+            standings[1].points
+        ) {
+
+            leader.textContent =
+                "⚡ تعادل في عدد النقاط!";
+
+            return;
+
+        }
+
+
+        leader.textContent =
+            `👑 ${standings[0].name} متصدر بـ ${standings[0].points} نقطة`;
+
+    }
+
+
+    updateStandings();
+
+</script>
+```
+
+</body>
+
+</html>

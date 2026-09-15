@@ -1,396 +1,333 @@
+// ======================================================
+// انطر أبلكاش 🔫
+// Shared version using Supabase
+// ======================================================
+
+// ==============================
+// SUPABASE
+// ==============================
+
+const SUPABASE_URL =
+    "https://hiiqdsparnucyqypzzrx.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_w0onydYU7lyufVgksxJgIQ_YkfX1pSq";
+
+const EVENTS_URL =
+    SUPABASE_URL + "/rest/v1/events";
+
+const SUPABASE_HEADERS = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": "Bearer " + SUPABASE_KEY,
+    "Content-Type": "application/json"
+};
+
+
+// ==============================
+// GAME DATA
+// ==============================
+
 let yousryScore = 0;
 let yassinScore = 0;
-
 let events = [];
 
 const WAIT_TIME = 24 * 60 * 60 * 1000;
 
+let pendingPlayer = null;
+let isLoading = false;
 
-/* =========================
-   آخر نقطة
-========================= */
 
-let lastPoint =
-    localStorage.getItem("lastPoint");
+// ==============================
+// LOAD EVENTS FROM SUPABASE
+// ==============================
 
-if (lastPoint) {
+async function loadEvents() {
 
     try {
 
-        lastPoint = JSON.parse(lastPoint);
+        const response = await fetch(
+            EVENTS_URL +
+            "?select=id,created_at,player,location" +
+            "&order=created_at.asc",
+            {
+                method: "GET",
+                headers: SUPABASE_HEADERS
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Supabase load error");
+        }
+
+        const data = await response.json();
+
+        events = Array.isArray(data) ? data : [];
+
+        calculateScores();
+        updateAll();
 
     } catch (error) {
 
-        lastPoint = null;
-
-        localStorage.removeItem("lastPoint");
+        console.error("Error loading events:", error);
 
     }
-
 }
 
 
-/* =========================
-   اللاعب المنتظر اختيار مكانه
-========================= */
+// ==============================
+// SILENT LOAD
+// ==============================
 
-let pendingPlayer = null;
+async function loadEventsSilently() {
 
+    if (isLoading) return;
 
-/* =========================
-   إضافة نقطة
-========================= */
+    isLoading = true;
 
-function addPoint(player) {
+    try {
 
-    if (
-        player !== "Yousry" &&
-        player !== "Yassin"
-    ) {
+        const response = await fetch(
+            EVENTS_URL +
+            "?select=id,created_at,player,location" +
+            "&order=created_at.asc",
+            {
+                method: "GET",
+                headers: SUPABASE_HEADERS
+            }
+        );
 
-        return;
-
-    }
-
-
-    const now = Date.now();
-
-
-    /* =========================
-       التأكد من انتهاء 24 ساعة
-    ========================= */
-
-    if (lastPoint) {
-
-        const timePassed =
-            now - Number(lastPoint.time);
-
-
-        if (timePassed < WAIT_TIME) {
-
-            const remaining =
-                WAIT_TIME - timePassed;
-
-
-            const hours =
-                Math.floor(
-                    remaining /
-                    (1000 * 60 * 60)
-                );
-
-
-            const minutes =
-                Math.floor(
-                    (
-                        remaining %
-                        (1000 * 60 * 60)
-                    ) /
-                    (1000 * 60)
-                );
-
-
-            alert(
-                "🚫 لسه مينفعش تاخد نقطة!\n\n" +
-                "🎯 آخر نقطة كانت لـ " +
-                lastPoint.player +
-                "\n\n⏱️ باقي تقريبًا " +
-                hours +
-                " ساعة و " +
-                minutes +
-                " دقيقة."
-            );
-
-
-            return;
-
+        if (!response.ok) {
+            throw new Error("Supabase load error");
         }
 
-    }
+        const data = await response.json();
 
+        events = Array.isArray(data) ? data : [];
 
-    /* =========================
-       التأكد من مفيش نَطْرة اليوم
-    ========================= */
+        calculateScores();
+        updateAll();
 
-    if (isNoPointToday()) {
+    } catch (error) {
 
-        alert(
-            "🚫 تسجيل النقطة مقفول!\n\n" +
-            "تم تسجيل «مفيش نَطْرة النهارده».\n\n" +
-            "↩️ لازم تضغط «إلغاء القرار — توجد نَطْرة» الأول."
-        );
+        console.error("Silent load error:", error);
 
+    } finally {
 
-        return;
+        isLoading = false;
 
     }
-
-
-    /* =========================
-       حفظ اللاعب مؤقتًا
-    ========================= */
-
-    pendingPlayer = player;
-
-
-    /* =========================
-       فتح نافذة اختيار المكان
-    ========================= */
-
-    const modal =
-        document.getElementById(
-            "question-modal"
-        );
-
-
-    if (modal) {
-
-        modal.style.display = "flex";
-
-    }
-
 }
 
 
-/* =========================
-   اختيار مكان النَّطْرة
-========================= */
+// ==============================
+// CALCULATE SCORES
+// ==============================
 
-function selectPointLocation(location) {
+function calculateScores() {
 
-    if (!pendingPlayer) {
+    yousryScore = 0;
+    yassinScore = 0;
 
-        return;
+    events.forEach(function (event) {
 
-    }
+        if (event.player === "Yousry") {
+            yousryScore++;
+        }
 
-
-    /* التأكد من المكان */
-
-    if (
-        typeof location !== "string" ||
-        location.trim() === ""
-    ) {
-
-        return;
-
-    }
-
-
-    const player =
-        pendingPlayer;
-
-
-    const now =
-        Date.now();
-
-
-    /* =========================
-       إضافة النقطة
-    ========================= */
-
-    if (player === "Yousry") {
-
-        yousryScore++;
-
-    }
-
-
-    if (player === "Yassin") {
-
-        yassinScore++;
-
-    }
-
-
-    /* =========================
-       تسجيل آخر نقطة
-    ========================= */
-
-    lastPoint = {
-
-        player: player,
-
-        time: now
-
-    };
-
-
-    localStorage.setItem(
-        "lastPoint",
-        JSON.stringify(lastPoint)
-    );
-
-
-    /* =========================
-       تسجيل الحدث
-    ========================= */
-
-    events.push({
-
-        player: player,
-
-        location: location.trim(),
-
-        date:
-            new Date(now)
-                .toLocaleDateString("ar-EG"),
-
-        time:
-            new Date(now)
-                .toLocaleTimeString("ar-EG"),
-
-        type: "point",
-
-        timestamp: now
+        if (event.player === "Yassin") {
+            yassinScore++;
+        }
 
     });
 
-
-    saveEvents();
-
-
-    /* =========================
-       إغلاق نافذة اختيار المكان
-    ========================= */
-
-    const questionModal =
-        document.getElementById(
-            "question-modal"
-        );
+}
 
 
-    if (questionModal) {
+// ==============================
+// CHECK LAST EVENT
+// ==============================
 
-        questionModal.style.display = "none";
+function getLastEvent() {
 
+    if (!events.length) {
+        return null;
     }
 
-
-    /* =========================
-       إغلاق نافذة المكان المخصص
-    ========================= */
-
-    const customModal =
-        document.getElementById(
-            "custom-location-modal"
-        );
-
-
-    if (customModal) {
-
-        customModal.style.display = "none";
-
-    }
-
-
-    /* =========================
-       تصفير اللاعب المنتظر
-    ========================= */
-
-    pendingPlayer = null;
-
-
-    /* =========================
-       تحديث البيانات
-    ========================= */
-
-    updateEvents();
-
-    updateStats();
-
-    updateLeader();
-
-    updateTimer();
-
-    updateTodayStatus();
-
-
-    /* =========================
-       رسالة التأكيد
-    ========================= */
-
-    alert(
-        "✅ " +
-        player +
-        " خد النَّطْرة 🎯\n\n" +
-        "📍 المكان: " +
-        location.trim()
-    );
-
-
-    /* =========================
-       Refresh تلقائي
-    ========================= */
-
-    window.location.reload();
+    return events[events.length - 1];
 
 }
 
 
-/* =========================
-   فتح كتابة مكان مخصص
-========================= */
+// ==============================
+// CHECK 24 HOURS
+// ==============================
 
-function customLocation() {
+function canAddPoint() {
 
-    if (!pendingPlayer) {
+    const lastEvent = getLastEvent();
+
+    if (!lastEvent) {
+        return true;
+    }
+
+    const lastTime =
+        new Date(lastEvent.created_at).getTime();
+
+    const now = Date.now();
+
+    return (now - lastTime) >= WAIT_TIME;
+
+}
+
+
+// ==============================
+// ADD POINT
+// ==============================
+
+function addPoint(player) {
+
+    if (!canAddPoint()) {
 
         alert(
-            "❌ اختار مين خد النقطة الأول."
+            "لسه فيه فترة انتظار ⏳\n" +
+            "لازم يعدي 24 ساعة من آخر نَطْرة."
         );
 
         return;
+    }
+
+    pendingPlayer = player;
+
+    const modal =
+        document.getElementById("question-modal");
+
+    if (modal) {
+        modal.style.display = "flex";
+    }
+
+}
+
+
+// ==============================
+// SELECT LOCATION
+// ==============================
+
+async function selectPointLocation(pointLocation) {
+
+    if (!pendingPlayer) {
+        return;
+    }
+
+    const player = pendingPlayer;
+
+    pendingPlayer = null;
+
+    const modal =
+        document.getElementById("question-modal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
+
+    await savePoint(player, pointLocation);
+
+}
+
+
+// ==============================
+// SAVE POINT
+// ==============================
+
+async function savePoint(player, pointLocation) {
+
+    if (!canAddPoint()) {
+
+        alert(
+            "حد سجل نَطْرة بالفعل منذ أقل من 24 ساعة."
+        );
+
+        await loadEventsSilently();
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            EVENTS_URL,
+            {
+                method: "POST",
+
+                headers: {
+                    ...SUPABASE_HEADERS,
+                    "Prefer": "return=representation"
+                },
+
+                body: JSON.stringify({
+                    player: player,
+                    location: pointLocation
+                })
+            }
+        );
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            console.error(errorText);
+
+            alert(
+                "حصلت مشكلة في تسجيل النَطْرة ❌"
+            );
+
+            return;
+        }
+
+        await loadEvents();
+
+    } catch (error) {
+
+        console.error("Save point error:", error);
+
+        alert(
+            "مش قادر أوصل للسيرفر ❌"
+        );
 
     }
 
+}
+
+
+// ==============================
+// CUSTOM LOCATION
+// ==============================
+
+function openCustomLocation() {
 
     const questionModal =
-        document.getElementById(
-            "question-modal"
-        );
-
+        document.getElementById("question-modal");
 
     const customModal =
-        document.getElementById(
-            "custom-location-modal"
-        );
-
-
-    const input =
-        document.getElementById(
-            "custom-location-input"
-        );
-
-
-    /* إخفاء نافذة اختيار المكان */
+        document.getElementById("custom-location-modal");
 
     if (questionModal) {
-
         questionModal.style.display = "none";
-
     }
-
-
-    /* فتح نافذة الكتابة */
 
     if (customModal) {
-
         customModal.style.display = "flex";
-
     }
 
-
-    /* تنظيف مربع الكتابة */
+    const input =
+        document.getElementById("custom-location-input");
 
     if (input) {
 
         input.value = "";
 
         setTimeout(function () {
-
             input.focus();
-
         }, 100);
 
     }
@@ -398,1204 +335,673 @@ function customLocation() {
 }
 
 
-/* =========================
-   تسجيل المكان المخصص
-========================= */
+// ==============================
+// SAVE CUSTOM LOCATION
+// ==============================
 
-function saveCustomLocation() {
-
-    if (!pendingPlayer) {
-
-        alert(
-            "❌ مفيش لاعب محدد."
-        );
-
-        return;
-
-    }
-
+async function saveCustomLocation() {
 
     const input =
-        document.getElementById(
-            "custom-location-input"
-        );
-
+        document.getElementById("custom-location-input");
 
     if (!input) {
-
-        alert(
-            "❌ مربع كتابة المكان مش موجود في الصفحة."
-        );
-
         return;
-
     }
 
-
-    const locationText =
+    const customLocation =
         input.value.trim();
 
+    if (!customLocation) {
 
-    /* التأكد إن المكان مكتوب */
-
-    if (locationText === "") {
-
-        alert(
-            "⚠️ اكتب المكان الأول."
-        );
-
-        input.focus();
+        alert("اكتب اسم المكان الأول.");
 
         return;
-
     }
 
+    const customModal =
+        document.getElementById("custom-location-modal");
 
-    /* تسجيل النقطة */
+    if (customModal) {
+        customModal.style.display = "none";
+    }
 
-    selectPointLocation(locationText);
+    await selectPointLocation(customLocation);
 
 }
 
 
-/* =========================
-   Enter لتسجيل المكان
-========================= */
+// ==============================
+// CANCEL CUSTOM LOCATION
+// ==============================
+
+function cancelCustomLocation() {
+
+    const customModal =
+        document.getElementById("custom-location-modal");
+
+    if (customModal) {
+        customModal.style.display = "none";
+    }
+
+    const questionModal =
+        document.getElementById("question-modal");
+
+    if (questionModal) {
+        questionModal.style.display = "flex";
+    }
+
+}
+
+
+// ==============================
+// CANCEL QUESTION
+// ==============================
+
+function cancelQuestion() {
+
+    pendingPlayer = null;
+
+    const modal =
+        document.getElementById("question-modal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
+
+}
+
+
+// ==============================
+// ENTER KEY FOR CUSTOM LOCATION
+// ==============================
 
 document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+    "keydown",
+    function (event) {
 
-        const input =
-            document.getElementById(
-                "custom-location-input"
-            );
-
-
-        if (!input) {
-
+        if (event.key !== "Enter") {
             return;
-
         }
 
+        const customModal =
+            document.getElementById("custom-location-modal");
 
-        input.addEventListener(
-            "keydown",
-            function (event) {
+        if (
+            customModal &&
+            customModal.style.display === "flex"
+        ) {
 
-                if (event.key === "Enter") {
+            event.preventDefault();
 
-                    event.preventDefault();
+            saveCustomLocation();
 
-                    saveCustomLocation();
-
-                }
-
-            }
-        );
+        }
 
     }
 );
 
 
-/* =========================
-   إلغاء كتابة المكان
-========================= */
+// ==============================
+// NO POINT TODAY
+// ==============================
 
-function cancelCustomLocation() {
+async function noPointToday() {
 
-    const customModal =
-        document.getElementById(
-            "custom-location-modal"
-        );
-
-
-    if (customModal) {
-
-        customModal.style.display = "none";
-
-    }
-
-
-    /* الرجوع لنافذة اختيار المكان */
-
-    if (pendingPlayer) {
-
-        const questionModal =
-            document.getElementById(
-                "question-modal"
-            );
-
-
-        if (questionModal) {
-
-            questionModal.style.display = "flex";
-
-        }
-
-    }
-
-}
-
-
-/* =========================
-   إلغاء سؤال المكان
-========================= */
-
-function cancelPointQuestion() {
-
-    const modal =
-        document.getElementById(
-            "question-modal"
-        );
-
-
-    if (modal) {
-
-        modal.style.display = "none";
-
-    }
-
-
-    pendingPlayer = null;
-
-}
-
-
-/* =========================
-   مفيش نَطْرة النهارده
-========================= */
-
-function noPointToday() {
-
-    const now =
-        Date.now();
-
-
-    const date =
-        new Date(now)
-            .toLocaleDateString("ar-EG");
-
-
-    /* التأكد إن مفيش تسجيل
-       لنفس اليوم */
-
-    const alreadyRecorded =
-        events.some(function (event) {
-
-            return (
-                event.type === "no-point" &&
-                event.date === date
-            );
-
-        });
-
-
-    if (alreadyRecorded) {
+    if (!canAddPoint()) {
 
         alert(
-            "🚫 تم تسجيل «مفيش نَطْرة النهارده» بالفعل."
+            "فيه نَطْرة مسجلة خلال آخر 24 ساعة."
         );
-
 
         return;
-
     }
 
-
-    /* تسجيل الحدث */
-
-    events.push({
-
-        player: "مفيش نَطْرة",
-
-        date: date,
-
-        time:
-            new Date(now)
-                .toLocaleTimeString("ar-EG"),
-
-        type: "no-point",
-
-        timestamp: now
-
-    });
-
-
-    saveEvents();
-
-    updateEvents();
-
-    updateTodayStatus();
-
-
-    alert(
-        "✅ تم تسجيل: مفيش نَطْرة النهارده\n\n" +
-        "🔒 تسجيل النقاط مقفول لحد إلغاء القرار."
+    const confirmed = confirm(
+        "متأكد إن مفيش نَطْرة النهارده؟"
     );
 
+    if (!confirmed) {
+        return;
+    }
 
-    /* Refresh تلقائي */
+    try {
 
-    window.location.reload();
+        const response = await fetch(
+            EVENTS_URL,
+            {
+                method: "POST",
 
-}
+                headers: {
+                    ...SUPABASE_HEADERS,
+                    "Prefer": "return=representation"
+                },
 
-
-/* =========================
-   حفظ الأحداث
-========================= */
-
-function saveEvents() {
-
-    localStorage.setItem(
-        "events",
-        JSON.stringify(events)
-    );
-
-}
-
-
-/* =========================
-   تحميل الأحداث
-========================= */
-
-function loadEvents() {
-
-    const saved =
-        localStorage.getItem("events");
-
-
-    if (saved) {
-
-        try {
-
-            events =
-                JSON.parse(saved);
-
-
-            if (!Array.isArray(events)) {
-
-                events = [];
-
+                body: JSON.stringify({
+                    player: "NO_POINT",
+                    location: "مفيش نَطْرة النهارده"
+                })
             }
-
-        } catch (error) {
-
-            events = [];
-
-        }
-
-    }
-
-
-    /* =========================
-       حساب النقاط
-    ========================= */
-
-    yousryScore = 0;
-
-    yassinScore = 0;
-
-
-    events.forEach(function (event) {
-
-        if (
-            event.type === "point" &&
-            event.player === "Yousry"
-        ) {
-
-            yousryScore++;
-
-        }
-
-
-        if (
-            event.type === "point" &&
-            event.player === "Yassin"
-        ) {
-
-            yassinScore++;
-
-        }
-
-    });
-
-
-    /* =========================
-       تحديث الأرقام
-    ========================= */
-
-    const yousryElement =
-        document.getElementById(
-            "yousry-score"
         );
 
+        if (!response.ok) {
 
-    const yassinElement =
-        document.getElementById(
-            "yassin-score"
+            console.error(await response.text());
+
+            alert(
+                "حصلت مشكلة في تسجيل الحالة ❌"
+            );
+
+            return;
+        }
+
+        await loadEvents();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "مش قادر أوصل للسيرفر ❌"
         );
-
-
-    if (yousryElement) {
-
-        yousryElement.textContent =
-            yousryScore;
-
-    }
-
-
-    if (yassinElement) {
-
-        yassinElement.textContent =
-            yassinScore;
 
     }
 
 }
 
 
-/* =========================
-   العداد
-========================= */
+// ==============================
+// CHECK IF LAST EVENT IS NO POINT
+// ==============================
+
+function isLastEventNoPoint() {
+
+    const lastEvent = getLastEvent();
+
+    if (!lastEvent) {
+        return false;
+    }
+
+    return lastEvent.player === "NO_POINT";
+
+}
+
+
+// ==============================
+// CANCEL NO POINT
+// ==============================
+
+async function cancelNoPoint() {
+
+    const lastEvent = getLastEvent();
+
+    if (!lastEvent) {
+        return;
+    }
+
+    if (!isLastEventNoPoint()) {
+
+        alert(
+            "مفيش قرار «مفيش نَطْرة» لإلغائه."
+        );
+
+        return;
+    }
+
+    const confirmed = confirm(
+        "متأكد إنك عايز تلغي «مفيش نَطْرة»؟"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    await deleteEventById(lastEvent.id);
+
+}
+
+
+// ==============================
+// DELETE LAST POINT
+// ==============================
+
+async function deleteLastPoint() {
+
+    const lastEvent = getLastEvent();
+
+    if (!lastEvent) {
+
+        alert("مفيش أحداث للحذف.");
+
+        return;
+    }
+
+    const confirmed = confirm(
+        "متأكد إنك عايز تحذف آخر تسجيل؟"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    await deleteEventById(lastEvent.id);
+
+}
+
+
+// ==============================
+// DELETE EVENT
+// ==============================
+
+async function deleteEventById(id) {
+
+    try {
+
+        const response = await fetch(
+            EVENTS_URL +
+            "?id=eq." +
+            encodeURIComponent(id),
+            {
+                method: "DELETE",
+                headers: SUPABASE_HEADERS
+            }
+        );
+
+        if (!response.ok) {
+
+            console.error(await response.text());
+
+            alert(
+                "حصلت مشكلة أثناء الحذف ❌"
+            );
+
+            return;
+        }
+
+        await loadEvents();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "مش قادر أوصل للسيرفر ❌"
+        );
+
+    }
+
+}
+
+
+// ==============================
+// TIMER
+// ==============================
 
 function updateTimer() {
 
-    const timer =
-        document.getElementById(
-            "timer"
-        );
+    const timerElement =
+        document.getElementById("timer");
 
+    const timerSection =
+        document.getElementById("timer-section");
 
-    const info =
-        document.getElementById(
-            "timer-info"
-        );
+    const lastEvent = getLastEvent();
 
-
-    if (!timer || !info) {
-
+    if (!timerElement) {
         return;
-
     }
 
+    if (!lastEvent) {
 
-    /* مفيش نقطة */
+        timerElement.textContent =
+            "متاح الآن 🟢";
 
-    if (!lastPoint) {
-
-        timer.textContent =
-            "النقطة متاحة الآن 🔥";
-
-
-        info.textContent =
-            "مفيش نقطة مسجلة حاليًا";
-
+        if (timerSection) {
+            timerSection.style.display = "block";
+        }
 
         return;
-
     }
 
+    const lastTime =
+        new Date(lastEvent.created_at).getTime();
 
-    const now =
-        Date.now();
-
-
-    const timePassed =
-        now -
-        Number(lastPoint.time);
-
-
-    /* انتهاء الـ24 ساعة */
-
-    if (timePassed >= WAIT_TIME) {
-
-        timer.textContent =
-            "النقطة متاحة الآن 🔥";
-
-
-        info.textContent =
-            "يلا مين الشاطر؟ 👀";
-
-
-        return;
-
-    }
-
-
-    /* الوقت المتبقي */
+    const now = Date.now();
 
     const remaining =
-        WAIT_TIME -
-        timePassed;
-
-
-    const hours =
-        Math.floor(
-            remaining /
-            (1000 * 60 * 60)
-        );
-
-
-    const minutes =
-        Math.floor(
-            (
-                remaining %
-                (1000 * 60 * 60)
-            ) /
-            (1000 * 60)
-        );
-
-
-    const seconds =
-        Math.floor(
-            (
-                remaining %
-                (1000 * 60)
-            ) /
-            1000
-        );
-
-
-    timer.textContent =
-        hours +
-        " ساعة : " +
-        minutes +
-        " دقيقة : " +
-        seconds +
-        " ثانية";
-
-
-    info.textContent =
-        "آخر نقطة كانت لـ " +
-        lastPoint.player;
-
-}
-
-
-/* =========================
-   حالة النقطة
-========================= */
-
-function updateTodayStatus() {
-
-    const status =
-        document.getElementById(
-            "today-status"
-        );
-
-
-    if (!status) {
-
-        return;
-
-    }
-
-
-    /* مفيش نَطْرة اليوم */
-
-    if (isNoPointToday()) {
-
-        status.textContent =
-            "🚫 مفيش نَطْرة النهارده — النقطة مقفولة 🔒";
-
-
-        return;
-
-    }
-
-
-    /* مفيش نقطة */
-
-    if (!lastPoint) {
-
-        status.textContent =
-            "النقطة متاحة 🔥";
-
-
-        return;
-
-    }
-
-
-    const remaining =
-        WAIT_TIME -
-        (
-            Date.now() -
-            Number(lastPoint.time)
-        );
-
-
-    /* انتهاء الـ24 ساعة */
+        WAIT_TIME - (now - lastTime);
 
     if (remaining <= 0) {
 
-        status.textContent =
-            "🎯 النقطة متاحة من جديد 🔥";
-
+        timerElement.textContent =
+            "متاح الآن 🟢";
 
         return;
-
     }
 
+    const totalSeconds =
+        Math.floor(remaining / 1000);
 
-    status.textContent =
-        "🎯 آخر نقطة كانت لـ " +
-        lastPoint.player;
+    const hours =
+        Math.floor(totalSeconds / 3600);
+
+    const minutes =
+        Math.floor(
+            (totalSeconds % 3600) / 60
+        );
+
+    const seconds =
+        totalSeconds % 60;
+
+    timerElement.textContent =
+        String(hours).padStart(2, "0") +
+        ":" +
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
 
 }
 
 
-/* =========================
-   معرفة هل مفيش نَطْرة اليوم
-========================= */
+// ==============================
+// TODAY STATUS
+// ==============================
 
-function isNoPointToday() {
+function updateTodayStatus() {
 
-    const today =
-        new Date()
-            .toLocaleDateString("ar-EG");
+    const element =
+        document.getElementById("today-status");
+
+    if (!element) {
+        return;
+    }
+
+    const lastEvent = getLastEvent();
+
+    if (!lastEvent) {
+
+        element.textContent =
+            "مفيش تسجيلات لسه النهارده.";
+
+        return;
+    }
+
+    const eventTime =
+        new Date(lastEvent.created_at);
+
+    const now =
+        new Date();
+
+    const sameDay =
+        eventTime.getFullYear() === now.getFullYear() &&
+        eventTime.getMonth() === now.getMonth() &&
+        eventTime.getDate() === now.getDate();
+
+    if (!sameDay) {
+
+        element.textContent =
+            "مفيش تسجيلات النهارده.";
+
+        return;
+    }
+
+    if (lastEvent.player === "Yousry") {
+
+        element.textContent =
+            "يسري كسب نَطْرة النهارده 🔫";
+
+        return;
+    }
+
+    if (lastEvent.player === "Yassin") {
+
+        element.textContent =
+            "ياسين كسب نَطْرة النهارده 🔫";
+
+        return;
+    }
+
+    if (lastEvent.player === "NO_POINT") {
+
+        element.textContent =
+            "مفيش نَطْرة النهارده 😴";
+
+    }
+
+}
 
 
-    return events.some(function (event) {
+// ==============================
+// EVENT LOG
+// ==============================
 
-        return (
-            event.type === "no-point" &&
-            event.date === today
-        );
+function updateEventLog() {
+
+    const container =
+        document.getElementById("event-log");
+
+    if (!container) {
+        return;
+    }
+
+    if (!events.length) {
+
+        container.innerHTML =
+            "<p>مفيش أحداث لسه.</p>";
+
+        return;
+    }
+
+    let html = "";
+
+    const reversedEvents =
+        [...events].reverse();
+
+    reversedEvents.forEach(function (event) {
+
+        const date =
+            new Date(event.created_at);
+
+        const dateText =
+            date.toLocaleDateString("ar-EG");
+
+        const timeText =
+            date.toLocaleTimeString(
+                "ar-EG",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            );
+
+        if (event.player === "NO_POINT") {
+
+            html += `
+                <div class="event-item">
+                    <strong>😴 مفيش نَطْرة النهارده</strong>
+                    <span>${dateText} - ${timeText}</span>
+                </div>
+            `;
+
+            return;
+        }
+
+        const playerName =
+            event.player === "Yousry"
+                ? "يسري"
+                : "ياسين";
+
+        html += `
+            <div class="event-item">
+                <strong>🔫 ${playerName} كسب النَطْرة</strong>
+                <span>📍 ${escapeHTML(event.location || "غير محدد")}</span>
+                <small>${dateText} - ${timeText}</small>
+            </div>
+        `;
 
     });
 
-}
-
-
-/* =========================
-   سجل الأحداث
-========================= */
-
-function updateEvents() {
-
-    const eventsContainer =
-        document.getElementById(
-            "events"
-        );
-
-
-    const eventCount =
-        document.getElementById(
-            "event-count"
-        );
-
-
-    if (!eventsContainer) {
-
-        return;
-
-    }
-
-
-    eventsContainer.innerHTML = "";
-
-
-    /* مفيش أحداث */
-
-    if (events.length === 0) {
-
-        eventsContainer.innerHTML = `
-
-            <div class="empty">
-
-                <div>🎯</div>
-
-                <p>
-                    مفيش أحداث لسه
-                </p>
-
-                <small>
-                    أول نقطة هتظهر هنا
-                </small>
-
-            </div>
-
-        `;
-
-
-        if (eventCount) {
-
-            eventCount.textContent =
-                "0 حدث";
-
-        }
-
-
-        return;
-
-    }
-
-
-    /* عرض الأحدث أولًا */
-
-    [...events]
-        .reverse()
-        .forEach(function (event) {
-
-            const eventElement =
-                document.createElement(
-                    "div"
-                );
-
-
-            eventElement.className =
-                "event";
-
-
-            /* حدث مفيش نَطْرة */
-
-            if (
-                event.type === "no-point"
-            ) {
-
-                eventElement.innerHTML = `
-
-                    <p>
-
-                        🚫
-
-                        <strong>
-                            مفيش نَطْرة
-                        </strong>
-
-                    </p>
-
-                    <small>
-
-                        📅 ${event.date}
-
-                        •
-
-                        ⏰ ${event.time}
-
-                    </small>
-
-                `;
-
-            }
-
-
-            /* حدث نقطة */
-
-            else {
-
-                eventElement.innerHTML = `
-
-                    <p>
-
-                        🎯
-
-                        <strong>
-                            ${event.player}
-                        </strong>
-
-                        كسب النقطة
-
-                    </p>
-
-                    <small>
-
-                        📍
-                        ${event.location || "غير محدد"}
-
-                        •
-
-                        📅
-                        ${event.date}
-
-                        •
-
-                        ⏰
-                        ${event.time}
-
-                    </small>
-
-                `;
-
-            }
-
-
-            eventsContainer.appendChild(
-                eventElement
-            );
-
-        });
-
-
-    if (eventCount) {
-
-        eventCount.textContent =
-            events.length +
-            " حدث";
-
-    }
+    container.innerHTML = html;
 
 }
 
 
-/* =========================
-   الإحصائيات
-========================= */
+// ==============================
+// STATS
+// ==============================
 
 function updateStats() {
 
-    const total =
-        document.getElementById(
-            "total-points"
-        );
+    const yousryElement =
+        document.getElementById("yousry-score");
 
+    const yassinElement =
+        document.getElementById("yassin-score");
 
-    const yousryWins =
-        document.getElementById(
-            "yousry-wins"
-        );
-
-
-    const yassinWins =
-        document.getElementById(
-            "yassin-wins"
-        );
-
-
-    if (total) {
-
-        total.textContent =
-            yousryScore +
-            yassinScore;
-
-    }
-
-
-    if (yousryWins) {
-
-        yousryWins.textContent =
+    if (yousryElement) {
+        yousryElement.textContent =
             yousryScore;
-
     }
 
-
-    if (yassinWins) {
-
-        yassinWins.textContent =
+    if (yassinElement) {
+        yassinElement.textContent =
             yassinScore;
+    }
+
+    const totalElement =
+        document.getElementById("total-points");
+
+    if (totalElement) {
+
+        totalElement.textContent =
+            yousryScore + yassinScore;
 
     }
 
 }
 
 
-/* =========================
-   المتصدر
-========================= */
+// ==============================
+// LEADER
+// ==============================
 
 function updateLeader() {
 
-    const leader =
-        document.getElementById(
-            "leader"
-        );
+    const element =
+        document.getElementById("leader");
 
-
-    if (!leader) {
-
+    if (!element) {
         return;
-
     }
-
 
     if (
         yousryScore === 0 &&
         yassinScore === 0
     ) {
 
-        leader.textContent =
-            "لسه مفيش نقاط 😎";
-
-
-        return;
-
-    }
-
-
-    if (
-        yousryScore >
-        yassinScore
-    ) {
-
-        leader.textContent =
-            "👑 Yousry متصدر بفارق " +
-            (
-                yousryScore -
-                yassinScore
-            ) +
-            " نقطة";
-
+        element.textContent =
+            "مفيش متصدر لسه 😎";
 
         return;
-
     }
 
+    if (yousryScore > yassinScore) {
 
-    if (
-        yassinScore >
-        yousryScore
-    ) {
-
-        leader.textContent =
-            "👑 Yassin متصدر بفارق " +
-            (
-                yassinScore -
-                yousryScore
-            ) +
-            " نقطة";
-
+        element.textContent =
+            "المتصدر: يسري 🏆";
 
         return;
-
     }
 
+    if (yassinScore > yousryScore) {
 
-    leader.textContent =
-        "⚡ تعادل!";
+        element.textContent =
+            "المتصدر: ياسين 🏆";
+
+        return;
+    }
+
+    element.textContent =
+        "تعادل 🤝";
 
 }
 
 
-/* =========================
-   حذف آخر نَطْرة
-========================= */
-
-function deleteLastPoint() {
-
-    let lastPointIndex = -1;
-
-
-    /* البحث عن آخر نقطة */
-
-    for (
-        let i = events.length - 1;
-        i >= 0;
-        i--
-    ) {
-
-        if (
-            events[i].type === "point"
-        ) {
-
-            lastPointIndex = i;
-
-            break;
-
-        }
-
-    }
-
-
-    /* لا توجد نقطة */
-
-    if (
-        lastPointIndex === -1
-    ) {
-
-        alert(
-            "❌ مفيش نَطْرة تقدر تحذفها."
-        );
-
-
-        return;
-
-    }
-
-
-    const point =
-        events[lastPointIndex];
-
-
-    /* تأكيد الحذف */
-
-    const confirmDelete =
-        confirm(
-
-            "⚠️ متأكد إنك عايز تحذف آخر نَطْرة؟\n\n" +
-
-            "🎯 اللاعب: " +
-            point.player +
-
-            "\n📍 المكان: " +
-            (
-                point.location ||
-                "غير محدد"
-            ) +
-
-            "\n📅 التاريخ: " +
-            point.date +
-
-            "\n⏰ الوقت: " +
-            point.time
-
-        );
-
-
-    if (!confirmDelete) {
-
-        return;
-
-    }
-
-
-    /* حذف النقطة */
-
-    events.splice(
-        lastPointIndex,
-        1
-    );
-
-
-    /* إعادة حساب النقاط */
-
-    yousryScore = 0;
-
-    yassinScore = 0;
-
-
-    events.forEach(function (event) {
-
-        if (
-            event.type === "point" &&
-            event.player === "Yousry"
-        ) {
-
-            yousryScore++;
-
-        }
-
-
-        if (
-            event.type === "point" &&
-            event.player === "Yassin"
-        ) {
-
-            yassinScore++;
-
-        }
-
-    });
-
-
-    /* البحث عن آخر نقطة موجودة */
-
-    lastPoint = null;
-
-
-    for (
-        let i = events.length - 1;
-        i >= 0;
-        i--
-    ) {
-
-        if (
-            events[i].type === "point"
-        ) {
-
-            lastPoint = {
-
-                player:
-                    events[i].player,
-
-                time:
-                    events[i].timestamp ||
-                    Date.now()
-
-            };
-
-
-            break;
-
-        }
-
-    }
-
-
-    /* حفظ آخر نقطة */
-
-    if (lastPoint) {
-
-        localStorage.setItem(
-            "lastPoint",
-            JSON.stringify(lastPoint)
-        );
-
-    } else {
-
-        localStorage.removeItem(
-            "lastPoint"
-        );
-
-    }
-
-
-    saveEvents();
-
-
-    updateEvents();
-
+// ==============================
+// UPDATE ALL
+// ==============================
+
+function updateAll() {
+
+    updateTimer();
+    updateTodayStatus();
+    updateEventLog();
     updateStats();
-
     updateLeader();
 
-    updateTimer();
-
-    updateTodayStatus();
+}
 
 
-    alert(
-        "✅ تم حذف آخر نَطْرة بنجاح."
-    );
+// ==============================
+// ESCAPE HTML
+// ==============================
 
+function escapeHTML(text) {
 
-    /* Refresh تلقائي */
+    const div =
+        document.createElement("div");
 
-    window.location.reload();
+    div.textContent =
+        text;
+
+    return div.innerHTML;
 
 }
 
 
-/* =========================
-   إلغاء مفيش نَطْرة
-========================= */
+// ==============================
+// START
+// ==============================
 
-function cancelNoPoint() {
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
 
-    const today =
-        new Date()
-            .toLocaleDateString("ar-EG");
+        await loadEvents();
 
-
-    const index =
-        events.findIndex(function (event) {
-
-            return (
-                event.type === "no-point" &&
-                event.date === today
-            );
-
-        });
-
-
-    /* مفيش قرار */
-
-    if (index === -1) {
-
-        alert(
-            "❌ مفيش قرار «مفيش نَطْرة النهارده» مسجل النهارده."
-        );
-
-
-        return;
+        updateAll();
 
     }
+);
 
 
-    /* تأكيد الإلغاء */
+// ==============================
+// TIMER UPDATE
+// ==============================
 
-    const confirmCancel =
-        confirm(
+setInterval(
+    function () {
 
-            "⚠️ هل أنت متأكد من إلغاء القرار؟\n\n" +
+        updateTimer();
+        updateTodayStatus();
 
-            "🎯 سيتم فتح تسجيل النقاط من جديد."
-
-        );
-
-
-    if (!confirmCancel) {
-
-        return;
-
-    }
+    },
+    1000
+);
 
 
-    /* حذف قرار مفيش نَطْرة */
+// ==============================
+// SYNC BETWEEN DEVICES
+// ==============================
+//
+// كل جهاز بيسأل Supabase كل 5 ثواني
+// عشان أي نَطْرة جديدة تظهر عند الطرف التاني.
+//
 
-    events.splice(
-        index,
-        1
-    );
+setInterval(
+    async function () {
 
+        await loadEventsSilently();
 
-    /*
-       مهم:
-       لا نمسح lastPoint هنا.
-       لو فيه نقطة سابقة ولسه
-       الـ24 ساعة مخلصتش، تفضل موجودة.
-    */
-
-
-    saveEvents();
-
-
-    updateEvents();
-
-    updateStats();
-
-    updateLeader();
-
-    updateTimer();
-
-    updateTodayStatus();
-
-
-    alert(
-
-        "✅ تم إلغاء القرار.\n\n" +
-
-        "🎯 يمكن تسجيل نقطة الآن، " +
-
-        "إذا كانت الـ24 ساعة من آخر نقطة قد انتهت."
-
-    );
-
-
-    /* Refresh تلقائي */
-
-    window.location.reload();
-
-}
-
-
-/* =========================
-   تشغيل الموقع
-========================= */
-
-loadEvents();
-
-updateEvents();
-
-updateStats();
-
-updateLeader();
-
-updateTimer();
-
-updateTodayStatus();
-
-
-/* =========================
-   تحديث العداد كل ثانية
-========================= */
-
-setInterval(function () {
-
-    updateTimer();
-
-    updateTodayStatus();
-
-}, 1000);
+    },
+    5000
+);

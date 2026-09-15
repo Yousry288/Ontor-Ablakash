@@ -4,19 +4,18 @@
 
 <head>
 
+    <meta charset="UTF-8">
 
-<meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0">
+    <title>ترتيب الدوري 🔫</title>
 
-<title>ترتيب الدوري 🔫</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <link rel="stylesheet" href="style.css">
 
 </head>
+
 
 <body>
 
@@ -42,7 +41,13 @@
 </header>
 
 
+
 <main>
+
+
+    <!-- ============================== -->
+    <!-- جدول الترتيب -->
+    <!-- ============================== -->
 
     <section class="section-card">
 
@@ -62,15 +67,21 @@
                     <tr>
 
                         <th>#</th>
+
                         <th>اللاعب</th>
+
                         <th>لعب</th>
+
                         <th>فاز</th>
+
                         <th>خسر</th>
+
                         <th>النقاط</th>
 
                     </tr>
 
                 </thead>
+
 
                 <tbody id="standings-body">
 
@@ -83,16 +94,28 @@
     </section>
 
 
+
+    <!-- ============================== -->
+    <!-- المتصدر -->
+    <!-- ============================== -->
+
     <section class="winner-card">
 
         <h2>👑 المتصدر</h2>
 
         <div id="leader">
+
             لسه مفيش نَطْرات 😎
+
         </div>
 
     </section>
 
+
+
+    <!-- ============================== -->
+    <!-- نظام الترتيب -->
+    <!-- ============================== -->
 
     <section class="section-card">
 
@@ -102,11 +125,15 @@
 
         </div>
 
+
         <p style="color:#9da3b0; line-height:2;">
 
             🎯 الفوز بالنَطْرة = 1 نقطة<br>
+
             ❌ الخسارة = 0 نقطة<br>
+
             🚫 مفيش تعادل<br>
+
             📊 «مفيش نَطْرة النهارده» لا تُحسب مباراة
 
         </p>
@@ -114,11 +141,22 @@
     </section>
 
 
-    <div style="text-align:center; margin-top:20px;">
+
+    <!-- ============================== -->
+    <!-- العودة -->
+    <!-- ============================== -->
+
+    <div
+        style="
+            text-align:center;
+            margin-top:20px;
+        "
+    >
 
         <a
             href="index.html"
-            class="ranking-button">
+            class="ranking-button"
+        >
 
             🔙 العودة للصفحة الرئيسية
 
@@ -126,149 +164,387 @@
 
     </div>
 
+
 </main>
+
 
 
 <script>
 
-    function getStandings() {
 
-        const events =
-            JSON.parse(
-                localStorage.getItem("events")
-            ) || [];
+    // ==================================================
+    // SUPABASE
+    // ==================================================
+
+    const SUPABASE_URL =
+        "https://hiiqdsparnucyqypzzrx.supabase.co";
+
+
+    const SUPABASE_KEY =
+        "sb_publishable_w0onydYU7lyufVgksxJgIQ_YkfX1pSq";
+
+
+    const EVENTS_URL =
+        SUPABASE_URL + "/rest/v1/events";
+
+
+    const SUPABASE_HEADERS = {
+
+        "apikey": SUPABASE_KEY,
+
+        "Authorization":
+            "Bearer " + SUPABASE_KEY
+
+    };
+
+
+
+    // ==================================================
+    // جلب الأحداث من Supabase
+    // ==================================================
+
+    async function getEvents() {
+
+        try {
+
+
+            const response = await fetch(
+
+                EVENTS_URL +
+
+                "?select=id,created_at,player,location" +
+
+                "&order=created_at.asc",
+
+                {
+
+                    method: "GET",
+
+                    headers:
+                        SUPABASE_HEADERS
+
+                }
+
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Supabase error: " +
+                    response.status
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            return Array.isArray(data)
+                ? data
+                : [];
+
+
+        } catch (error) {
+
+
+            console.error(
+                "Error loading events:",
+                error
+            );
+
+
+            return [];
+
+        }
+
+    }
+
+
+
+    // ==================================================
+    // حساب الترتيب
+    // ==================================================
+
+    function getStandings(events) {
 
 
         let yousryWins = 0;
+
         let yassinWins = 0;
 
 
-        /*
-            كل حدث من نوع point
-            = مباراة واحدة
-        */
 
         events.forEach(event => {
 
-            if (event.type !== "point") {
+
+            // مفيش نَطْرة لا تُحسب
+
+            if (
+
+                event.player !== "Yousry" &&
+
+                event.player !== "Yassin"
+
+            ) {
+
                 return;
+
             }
 
 
-            if (event.player === "Yousry") {
+
+            // نقطة يسري
+
+            if (
+                event.player === "Yousry"
+            ) {
+
                 yousryWins++;
+
             }
 
 
-            if (event.player === "Yassin") {
+
+            // نقطة ياسين
+
+            if (
+                event.player === "Yassin"
+            ) {
+
                 yassinWins++;
+
             }
 
         });
 
+
+
+        // إجمالي النَطْرات
 
         const totalMatches =
             yousryWins + yassinWins;
 
 
+
         return [
 
+
             {
+
                 name: "Yousry",
+
                 played: totalMatches,
+
                 wins: yousryWins,
+
                 losses: yassinWins,
+
                 points: yousryWins
+
             },
 
+
             {
+
                 name: "Yassin",
+
                 played: totalMatches,
+
                 wins: yassinWins,
+
                 losses: yousryWins,
+
                 points: yassinWins
+
             }
 
-        ].sort((a, b) => {
 
-            return b.points - a.points;
+        ].sort(
 
-        });
+            (a, b) => {
+
+                return b.points - a.points;
+
+            }
+
+        );
 
     }
 
 
-    function updateStandings() {
+
+    // ==================================================
+    // تحديث جدول الترتيب
+    // ==================================================
+
+    async function updateStandings() {
+
+
+        const events =
+            await getEvents();
+
+
 
         const standings =
-            getStandings();
+            getStandings(events);
+
+
 
         const body =
             document.getElementById(
                 "standings-body"
             );
 
+
+
+        if (!body) {
+
+            return;
+
+        }
+
+
+
         body.innerHTML = "";
 
 
-        standings.forEach((player, index) => {
 
-            const row =
-                document.createElement("tr");
+        standings.forEach(
+
+            (player, index) => {
 
 
-            if (index === 0 && player.points > 0) {
+                const row =
+                    document.createElement("tr");
 
-                row.classList.add("first-place");
+
+
+                // تمييز المركز الأول
+
+                if (
+
+                    index === 0 &&
+
+                    player.points > 0
+
+                ) {
+
+                    row.classList.add(
+                        "first-place"
+                    );
+
+                }
+
+
+
+                // الميدالية
+
+                let medal = "";
+
+
+
+                if (index === 0) {
+
+                    medal = "🥇";
+
+                }
+
+
+
+                if (index === 1) {
+
+                    medal = "🥈";
+
+                }
+
+
+
+                // إنشاء الصف
+
+                row.innerHTML = `
+
+                    <td class="rank-number">
+
+                        ${medal || index + 1}
+
+                    </td>
+
+
+                    <td class="player-name">
+
+                        ${player.name}
+
+                    </td>
+
+
+                    <td>
+
+                        ${player.played}
+
+                    </td>
+
+
+                    <td>
+
+                        ${player.wins}
+
+                    </td>
+
+
+                    <td>
+
+                        ${player.losses}
+
+                    </td>
+
+
+                    <td class="points-number">
+
+                        ${player.points}
+
+                    </td>
+
+                `;
+
+
+
+                body.appendChild(row);
 
             }
 
-
-            let medal = "";
-
-            if (index === 0) medal = "🥇";
-            if (index === 1) medal = "🥈";
+        );
 
 
-            row.innerHTML = `
 
-                <td class="rank-number">
-                    ${medal || index + 1}
-                </td>
-
-                <td class="player-name">
-                    ${player.name}
-                </td>
-
-                <td>
-                    ${player.played}
-                </td>
-
-                <td>
-                    ${player.wins}
-                </td>
-
-                <td>
-                    ${player.losses}
-                </td>
-
-                <td class="points-number">
-                    ${player.points}
-                </td>
-
-            `;
-
-
-            body.appendChild(row);
-
-        });
-
+        // ==================================================
+        // المتصدر
+        // ==================================================
 
         const leader =
-            document.getElementById("leader");
+            document.getElementById(
+                "leader"
+            );
 
 
-        if (standings[0].points === 0) {
+
+        if (!leader) {
+
+            return;
+
+        }
+
+
+
+        // مفيش نقاط
+
+        if (
+
+            standings[0].points === 0
+
+        ) {
 
             leader.textContent =
                 "لسه مفيش نَطْرات 😎";
@@ -278,9 +554,15 @@
         }
 
 
+
+        // تعادل
+
         if (
+
             standings[0].points ===
+
             standings[1].points
+
         ) {
 
             leader.textContent =
@@ -291,16 +573,44 @@
         }
 
 
+
+        // متصدر
+
         leader.textContent =
+
             `👑 ${standings[0].name} متصدر بـ ${standings[0].points} نقطة`;
 
     }
 
 
+
+    // ==================================================
+    // تشغيل الصفحة
+    // ==================================================
+
     updateStandings();
 
+
+
+    // ==================================================
+    // تحديث تلقائي كل 5 ثواني
+    // ==================================================
+
+    setInterval(
+
+        function () {
+
+            updateStandings();
+
+        },
+
+        5000
+
+    );
+
+
 </script>
-```
+
 
 </body>
 
